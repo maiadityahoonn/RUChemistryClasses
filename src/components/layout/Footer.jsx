@@ -36,11 +36,11 @@ const Footer = () => {
           </h4>
           <ul className="space-y-3.5 md:space-y-4">
             {[
-              { name: 'Home Landing', path: '/' },
-              { name: 'Premium Courses', path: '/courses' },
-              { name: 'Study Notes', path: '/notes' },
-              { name: 'Interactive Tests', path: '/tests' },
-              { name: 'Global Leaderboard', path: '/leaderboard' },
+              { name: 'Home', path: '/' },
+              { name: 'Courses', path: '/courses' },
+              { name: 'Notes', path: '/notes' },
+              { name: 'Tests', path: '/tests' },
+              { name: 'Leaderboard', path: '/leaderboard' },
               { name: 'Support Center', path: '/contact' },
             ].map((item) => (<li key={item.name}>
               <Link to={item.path} className="text-gray-400 hover:text-primary transition-all duration-300 flex items-center justify-center sm:justify-start group text-base">
@@ -108,7 +108,7 @@ const Footer = () => {
               <div className="space-y-1 text-left">
                 <p className="text-sm font-bold text-white italic">Call Us</p>
                 <a href="tel:+919876543210" className="text-gray-400 text-sm hover:text-primary transition-colors">
-                  +91 98765 43210
+                  +91 7225814452
                 </a>
               </div>
             </div>

@@ -6,18 +6,21 @@ export const useCategories = () => {
     return useQuery({
         queryKey: ['categories'],
         queryFn: async () => {
-            // 1. Fetch distict categories from courses
-            const { data, error } = await supabase
-                .from('courses')
-                .select('category')
-                .eq('is_active', true);
+            // 1. Fetch distinct categories from courses, notes, and tests
+            const [coursesRes, notesRes, testsRes] = await Promise.all([
+                supabase.from('courses').select('category').eq('is_active', true),
+                supabase.from('notes').select('category'),
+                supabase.from('tests').select('category')
+            ]);
 
-            if (error) throw error;
+            if (coursesRes.error) throw coursesRes.error;
+            if (notesRes.error) throw notesRes.error;
+            if (testsRes.error) throw testsRes.error;
 
-            // 2. Count courses per category
+            // 2. Count items per category across all tables
             const counts = {};
-            data.forEach(course => {
-                const cat = course.category;
+            [...(coursesRes.data || []), ...(notesRes.data || []), ...(testsRes.data || [])].forEach(item => {
+                const cat = item.category;
                 counts[cat] = (counts[cat] || 0) + 1;
             });
 

@@ -10,7 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
 import { useCoursesList, useCreateCourse, useUpdateCourse, useDeleteCourse } from '@/hooks/useAdmin';
-import { useCategories } from '@/hooks/useCategories';
+import { categoryConfig } from '@/config/categoryConfig';
 
 const AdminCourses = () => {
   const [searchQuery, setSearchQuery] = useState('');
@@ -42,7 +42,6 @@ const AdminCourses = () => {
   });
 
   const { data: courses, isLoading } = useCoursesList();
-  const { data: categories } = useCategories();
   const createCourse = useCreateCourse();
   const updateCourse = useUpdateCourse();
   const deleteCourse = useDeleteCourse();
@@ -125,7 +124,7 @@ const AdminCourses = () => {
   };
 
   const handleDelete = async (id) => {
-    if (confirm('Are you sure you want to delete this course?')) {
+    if (confirm('Are you sure you want to delete this course? This will permanently remove it, including all lessons and purchase history.')) {
       await deleteCourse.mutateAsync(id);
     }
   };
@@ -164,9 +163,9 @@ const AdminCourses = () => {
                       <SelectValue placeholder="Select category" />
                     </SelectTrigger>
                     <SelectContent>
-                      {categories?.map((cat) => (
-                        <SelectItem key={cat.id} value={cat.name}>
-                          {cat.icon} {cat.name}
+                      {Object.keys(categoryConfig).map((catName) => (
+                        <SelectItem key={catName} value={catName}>
+                          {categoryConfig[catName].icon} {catName}
                         </SelectItem>
                       ))}
                     </SelectContent>

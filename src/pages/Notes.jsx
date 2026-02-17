@@ -13,7 +13,7 @@ import { useCategories } from '@/hooks/useCategories';
 import { useCourses } from '@/hooks/useCourses';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
-import { useIsAdmin, useCoursesList, useUserPurchases, useBuyNote } from '@/hooks/useAdmin';
+import { useIsAdmin, useCoursesList, useUserPurchases, useBuyNote, useCategoryPurchases, useBuyCategory } from '@/hooks/useAdmin';
 
 
 const Notes = () => {
@@ -25,7 +25,9 @@ const Notes = () => {
   const { data: allCourses } = useCoursesList();
   const { data: isAdmin } = useIsAdmin();
   const { data: purchases } = useUserPurchases();
+  const { data: categoryPurchases } = useCategoryPurchases();
   const { mutate: buyNote } = useBuyNote();
+  const { mutate: buyCategory } = useBuyCategory();
 
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedNote, setSelectedNote] = useState(null);
@@ -52,12 +54,19 @@ const Notes = () => {
     const isNotePurchased = purchases?.some(p => p.note_id === note.id);
     if (isNotePurchased)
       return true;
+    // Check if category is purchased
+    const isCategoryPurchased = categoryPurchases?.some(cp =>
+      cp.category === note.category &&
+      (cp.content_type === 'notes' || cp.content_type === 'both')
+    );
+    if (isCategoryPurchased)
+      return true;
     // Check if course in the same category is purchased
-    const isCategoryPurchased = enrolledCourses?.some(ec => {
+    const isCourseEnrolled = enrolledCourses?.some(ec => {
       const courseDetails = allCourses?.find(c => c.id === ec.course_id);
       return courseDetails?.category === note.category;
     });
-    if (isCategoryPurchased)
+    if (isCourseEnrolled)
       return true;
     return false;
   };
@@ -72,6 +81,42 @@ const Notes = () => {
       return;
     }
     buyNote(note.id);
+  };
+
+  const handleBuyCategory = (category) => {
+    if (!user) {
+      toast({
+        title: 'Please sign in',
+        description: 'You need to be logged in to purchase categories',
+        variant: 'destructive',
+      });
+      navigate('/login');
+      return;
+    }
+    // Calculate total price for all notes in category
+    const categoryNotes = notes?.filter(n => n.category === category.name) || [];
+    const totalPrice = categoryNotes.reduce((sum, note) => sum + (note.price || 0), 0);
+
+    buyCategory({ category: category.name, contentType: 'notes', amount: totalPrice });
+  };
+
+  const checkCategoryAccess = (categoryName) => {
+    if (!user) return false;
+    if (isAdmin) return true;
+
+    // Check if category is purchased
+    const isCategoryPurchased = categoryPurchases?.some(cp =>
+      cp.category === categoryName &&
+      (cp.content_type === 'notes' || cp.content_type === 'both')
+    );
+    if (isCategoryPurchased) return true;
+
+    // Check if course in the same category is purchased
+    const isCourseEnrolled = enrolledCourses?.some(ec => {
+      const courseDetails = allCourses?.find(c => c.id === ec.course_id);
+      return courseDetails?.category === categoryName;
+    });
+    return !!isCourseEnrolled;
   };
   const filteredNotes = notes?.filter(note => note.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
     note.content.toLowerCase().includes(searchQuery.toLowerCase()));
@@ -124,20 +169,24 @@ const Notes = () => {
                   {[1, 2, 3, 4, 5, 6].map((i) => (<div key={i} className="h-64 bg-secondary/50 rounded-2xl animate-pulse" />))}
                 </div>) : (<div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
                   {notesByCategory.map((category, index) => {
-                    const hasCatAccess = enrolledCourses?.some(ec => {
-                      const courseDetails = allCourses?.find(c => c.id === ec.course_id);
-                      return courseDetails?.category === category.name;
-                    }) || isAdmin;
+                    const hasCatAccess = checkCategoryAccess(category.name);
+                    const categoryNotes = category.notes || [];
+                    const totalPrice = categoryNotes.reduce((sum, note) => sum + (note.price || 0), 0);
+
                     return (<motion.div key={category.id} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: index * 0.1 }}>
-                      <Card className="group hover:shadow-xl transition-all duration-300 border-border hover:border-primary/50 h-full flex flex-col cursor-pointer" onClick={() => navigate(`/notes/${category.slug}`)}>
+                      <Card className="group hover:shadow-xl transition-all duration-300 border-border hover:border-primary/50 h-full flex flex-col">
                         <CardHeader className="p-5 md:p-6">
                           <div className="flex items-start justify-between mb-4">
                             <div className={`w-12 h-12 md:w-14 md:h-14 rounded-2xl bg-gradient-to-br ${category.gradient} flex items-center justify-center text-xl md:text-2xl`}>
                               {category.icon}
                             </div>
-                            {!hasCatAccess && (<div className="p-2 rounded-full bg-secondary/80 text-muted-foreground backdrop-blur-sm">
-                              <Lock className="w-4 h-4 md:w-5 md:h-5" />
-                            </div>)}
+                            {hasCatAccess ? (
+                              <Badge variant="default" className="bg-green-500 text-white">Owned</Badge>
+                            ) : (
+                              <div className="p-2 rounded-full bg-secondary/80 text-muted-foreground backdrop-blur-sm">
+                                <Lock className="w-4 h-4 md:w-5 md:h-5" />
+                              </div>
+                            )}
                           </div>
                           <CardTitle className="text-lg md:text-xl group-hover:text-primary transition-colors">
                             {category.name}
@@ -149,11 +198,38 @@ const Notes = () => {
                             <Badge variant="secondary" className="text-[10px] md:text-xs">
                               {category.notes.length} {category.notes.length === 1 ? 'Note' : 'Notes'}
                             </Badge>
+                            {!hasCatAccess && totalPrice > 0 && (
+                              <span className="text-sm font-bold text-primary">₹{totalPrice}</span>
+                            )}
                           </div>
-                          <Button variant={hasCatAccess ? "gradient" : "outline"} className="w-full h-10 md:h-11 text-sm group/btn">
-                            {hasCatAccess ? 'View Notes' : 'Unlock Now'}
-                            {hasCatAccess ? (<ArrowRight className="w-4 h-4 ml-2 group-hover/btn:translate-x-1 transition-transform" />) : (<Lock className="w-4 h-4 ml-2" />)}
-                          </Button>
+                          {hasCatAccess ? (
+                            <Button variant="gradient" className="w-full h-10 md:h-11 text-sm group/btn" onClick={() => navigate(`/notes/${category.slug}`)}>
+                              View Notes
+                              <ArrowRight className="w-4 h-4 ml-2 group-hover/btn:translate-x-1 transition-transform" />
+                            </Button>
+                          ) : (
+                            <div className="flex flex-col gap-2">
+                              <Button
+                                variant="gradient"
+                                className="w-full h-10 md:h-11 text-sm"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleBuyCategory(category);
+                                }}
+                              >
+                                <ShoppingCart className="w-4 h-4 mr-2" />
+                                Buy Category (₹{totalPrice})
+                              </Button>
+                              <Button
+                                variant="outline"
+                                className="w-full h-10 md:h-11 text-sm"
+                                onClick={() => navigate(`/notes/${category.slug}`)}
+                              >
+                                View Details
+                                <ArrowRight className="w-4 h-4 ml-2" />
+                              </Button>
+                            </div>
+                          )}
                         </CardContent>
                       </Card>
                     </motion.div>);

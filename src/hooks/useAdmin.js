@@ -86,6 +86,7 @@ export const useCreateNote = () => {
         },
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['notes'] });
+            queryClient.invalidateQueries({ queryKey: ['public-notes'] });
             toast({ title: 'Note created successfully' });
         },
         onError: (error) => {
@@ -110,6 +111,7 @@ export const useUpdateNote = () => {
         },
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['notes'] });
+            queryClient.invalidateQueries({ queryKey: ['public-notes'] });
             toast({ title: 'Note updated successfully' });
         },
         onError: (error) => {
@@ -128,6 +130,7 @@ export const useDeleteNote = () => {
         },
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['notes'] });
+            queryClient.invalidateQueries({ queryKey: ['public-notes'] });
             toast({ title: 'Note deleted successfully' });
         },
         onError: (error) => {
@@ -256,7 +259,11 @@ export const useDeleteCourse = () => {
     const { toast } = useToast();
     return useMutation({
         mutationFn: async (id) => {
-            const { error } = await supabase.from('courses').delete().eq('id', id);
+            // Hard delete using secure RPC to bypass RLS and handle constraints
+            const { error } = await supabase.rpc('delete_course_completely', {
+                p_course_id: id
+            });
+
             if (error)
                 throw error;
         },
@@ -571,6 +578,62 @@ export const useBuyNote = () => {
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['user-purchases'] });
             toast({ title: 'Note unlocked successfully!' });
+        },
+        onError: (error) => {
+            toast({ title: 'Purchase failed', description: error.message, variant: 'destructive' });
+        },
+    });
+};
+
+// Category Purchases
+export const useCategoryPurchases = () => {
+    const { user } = useAuth();
+    return useQuery({
+        queryKey: ['category-purchases', user?.id],
+        queryFn: async () => {
+            if (!user)
+                return [];
+            const { data, error } = await supabase
+                .from('category_purchases')
+                .select('*')
+                .eq('user_id', user.id)
+                .eq('status', 'completed');
+            if (error)
+                throw error;
+            return data;
+        },
+        enabled: !!user,
+    });
+};
+
+export const useBuyCategory = () => {
+    const queryClient = useQueryClient();
+    const { toast } = useToast();
+    const { user } = useAuth();
+    return useMutation({
+        mutationFn: async ({ category, contentType, amount }) => {
+            if (!user)
+                throw new Error('User not authenticated');
+            const { data, error } = await supabase
+                .from('category_purchases')
+                .insert([{
+                    user_id: user.id,
+                    category,
+                    content_type: contentType,
+                    amount,
+                    order_id: `CAT_${contentType.toUpperCase()}_${Date.now()}_${Math.random().toString(36).substring(7)}`,
+                    status: 'completed',
+                    payment_id: 'internal_' + Math.random().toString(36).substring(7),
+                }])
+                .select()
+                .single();
+            if (error)
+                throw error;
+            return data;
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['category-purchases'] });
+            toast({ title: 'Category unlocked successfully!' });
         },
         onError: (error) => {
             toast({ title: 'Purchase failed', description: error.message, variant: 'destructive' });

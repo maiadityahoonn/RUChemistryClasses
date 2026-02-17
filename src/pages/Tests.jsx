@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Award, Clock, ArrowRight, Target, Lock, ChevronRight, ChevronLeft, CheckCircle, XCircle, Trophy, Zap, RotateCcw, Home } from 'lucide-react';
+import { Award, Clock, ArrowRight, Target, Lock, ChevronRight, ChevronLeft, CheckCircle, XCircle, Trophy, Zap, RotateCcw, Home, ShoppingCart } from 'lucide-react';
 import Navbar from '@/components/layout/Navbar';
 import Footer from '@/components/layout/Footer';
 import { Button } from '@/components/ui/button';
@@ -9,7 +9,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { useTests } from '@/hooks/useTests';
-import { useIsAdmin, useCoursesList, useUserPurchases, useBuyTest } from '@/hooks/useAdmin';
+import { useIsAdmin, useCoursesList, useUserPurchases, useBuyTest, useCategoryPurchases, useBuyCategory } from '@/hooks/useAdmin';
 import { useCourses } from '@/hooks/useCourses';
 import { useCategories } from '@/hooks/useCategories';
 import { useAuth } from '@/contexts/AuthContext';
@@ -25,7 +25,9 @@ const Tests = () => {
   const { enrolledCourses } = useCourses();
   const { data: allCourses } = useCoursesList();
   const { data: purchases } = useUserPurchases();
+  const { data: categoryPurchases } = useCategoryPurchases();
   const { mutate: buyTest } = useBuyTest();
+  const { mutate: buyCategory } = useBuyCategory();
 
   // Fetch Categories
   const { data: categories, isLoading: categoriesLoading } = useCategories();
@@ -53,11 +55,18 @@ const Tests = () => {
       return true;
     if (test && purchases?.some(p => p.test_id === test.id))
       return true;
-    const isCategoryPurchased = enrolledCourses?.some(ec => {
+    // Check if category is purchased
+    const isCategoryPurchased = categoryPurchases?.some(cp =>
+      cp.category === (test?.category || categoryName) &&
+      (cp.content_type === 'tests' || cp.content_type === 'both')
+    );
+    if (isCategoryPurchased)
+      return true;
+    const isCategoryPurchased2 = enrolledCourses?.some(ec => {
       const courseDetails = allCourses?.find(c => c.id === ec.course_id);
       return courseDetails?.category === (test?.category || categoryName);
     });
-    return !!isCategoryPurchased;
+    return !!isCategoryPurchased2;
   };
   const handleBuyTest = (test) => {
     if (!user) {
@@ -70,6 +79,42 @@ const Tests = () => {
       return;
     }
     buyTest(test.id);
+  };
+
+  const handleBuyCategory = (category) => {
+    if (!user) {
+      toast({
+        title: 'Please sign in',
+        description: 'You need to be logged in to purchase categories',
+        variant: 'destructive',
+      });
+      navigate('/login');
+      return;
+    }
+    // Calculate total price for all tests in category
+    const categoryTests = allTests?.filter(t => t.category === category.name) || [];
+    const totalPrice = categoryTests.reduce((sum, test) => sum + (test.price || 0), 0);
+
+    buyCategory({ category: category.name, contentType: 'tests', amount: totalPrice });
+  };
+
+  const checkCategoryAccess = (categoryName) => {
+    if (!user) return false;
+    if (isAdmin) return true;
+
+    // Check if category is purchased
+    const isCategoryPurchased = categoryPurchases?.some(cp =>
+      cp.category === categoryName &&
+      (cp.content_type === 'tests' || cp.content_type === 'both')
+    );
+    if (isCategoryPurchased) return true;
+
+    // Check if course in the same category is purchased
+    const isCourseEnrolled = enrolledCourses?.some(ec => {
+      const courseDetails = allCourses?.find(c => c.id === ec.course_id);
+      return courseDetails?.category === categoryName;
+    });
+    return !!isCourseEnrolled;
   };
   const handleStartTest = (test) => {
     if (!user) {
@@ -98,62 +143,87 @@ const Tests = () => {
     setShowAnswer(true);
   };
   const calculateScore = () => {
-    if (!selectedTest)
+    if (!selectedTest || !selectedTest.questions || selectedTest.questions.length === 0)
       return { correct: 0, total: 0, percentage: 0, xp: 0 };
+
     let correct = 0;
-    let totalXp = 0;
     selectedTest.questions.forEach((q, i) => {
       if (answers[i] === q.correctAnswer) {
         correct++;
-        totalXp += q.points;
       }
     });
+
+    const totalQuestions = selectedTest.questions.length;
+    const percentage = Math.round((correct / totalQuestions) * 100) || 0;
+
+    // Use test.reward_points as the base, weighted by performance
+    const xpBase = selectedTest.reward_points || 0;
+    const xpEarned = Math.round((percentage / 100) * xpBase) || 0;
+
     return {
       correct,
-      total: selectedTest.questions.length,
-      percentage: Math.round((correct / selectedTest.questions.length) * 100),
-      xp: totalXp,
+      total: totalQuestions,
+      percentage: isNaN(percentage) ? 0 : percentage,
+      xp: isNaN(xpEarned) ? 0 : xpEarned,
     };
   };
+
   const saveTestResult = async () => {
     if (!user || !selectedTest)
       return;
+
     setIsSaving(true);
     const score = calculateScore();
+
     try {
+      console.log('Attempting to save test result:', {
+        testId: selectedTest.id,
+        score: score.percentage,
+        xp: score.xp
+      });
+
       // Check if user already took this test to prevent double XP
-      const { data: existingResults } = await supabase
+      const { data: existingResults, error: fetchError } = await supabase
         .from('test_results')
         .select('id')
         .eq('user_id', user.id)
         .eq('test_id', selectedTest.id)
         .limit(1);
+
+      if (fetchError) throw fetchError;
+
       const hasAttemptedBefore = existingResults && existingResults.length > 0;
+
       const { error: insertError } = await supabase.from('test_results').insert({
         user_id: user.id,
         test_id: selectedTest.id,
-        score: score.percentage,
-        total_questions: score.total,
-        xp_earned: score.xp,
+        score: score.percentage || 0,
+        total_questions: score.total || 0,
+        xp_earned: hasAttemptedBefore ? 0 : (score.xp || 0),
       });
-      if (!insertError && !hasAttemptedBefore) {
+
+      if (insertError) throw insertError;
+
+      if (!hasAttemptedBefore && score.xp > 0) {
         await addXP(score.xp);
         toast({
-          title: 'Test Completed! 🏆',
-          description: `You earned ${score.xp} XP for your first attempt!`,
+          title: 'Congratulations! 🏆',
+          description: `You earned ${score.xp} XP for your first completion of this challenge!`,
         });
-      }
-      else if (!insertError) {
+      } else if (hasAttemptedBefore) {
         toast({
-          title: 'Test Attempt Saved',
-          description: `Score: ${score.percentage}%. (No extra XP for retakes)`,
+          title: 'Result Saved',
+          description: `Score: ${score.percentage}%. Remember, XP is only awarded for the first attempt.`,
         });
       }
-    }
-    catch (error) {
+    } catch (error) {
       console.error('Error saving test result:', error);
-    }
-    finally {
+      toast({
+        title: 'Error saving results',
+        description: error.message || 'Your progress couldn\'t be saved. Please try again later.',
+        variant: 'destructive',
+      });
+    } finally {
       setIsSaving(false);
     }
   };
@@ -324,19 +394,23 @@ const Tests = () => {
                   {[1, 2, 3, 4, 5, 6].map(i => <div key={i} className="h-64 bg-secondary/50 rounded-2xl animate-pulse" />)}
                 </div>) : (<div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 lg:gap-8">
                   {categories?.map((category, index) => {
-                    const hasCatAccess = enrolledCourses?.some(ec => {
-                      const courseDetails = allCourses?.find(c => c.id === ec.course_id);
-                      return courseDetails?.category === category.name;
-                    }) || isAdmin;
+                    const hasCatAccess = checkCategoryAccess(category.name);
                     const catTests = allTests?.filter(t => t.category === category.name) || [];
+                    const totalPrice = catTests.reduce((sum, test) => sum + (test.price || 0), 0);
+                    const totalDuration = catTests.reduce((acc, t) => acc + t.duration_minutes, 0);
+
                     return (<motion.div key={category.id} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: index * 0.1 }}>
-                      <Card className="group hover:shadow-xl transition-all cursor-pointer border-border hover:border-primary/40 h-full flex flex-col" onClick={() => navigate(`/tests/${category.slug}`)}>
+                      <Card className="group hover:shadow-xl transition-all border-border hover:border-primary/40 h-full flex flex-col">
                         <CardHeader className="p-5 md:p-6">
                           <div className="flex justify-between items-start mb-4">
                             <div className={`w-12 h-12 md:w-14 md:h-14 rounded-2xl bg-gradient-to-br ${category.gradient} flex items-center justify-center text-xl md:text-2xl shadow-lg`}>
                               {category.icon}
                             </div>
-                            {!hasCatAccess && <div className="p-2 rounded-full bg-secondary text-muted-foreground"><Lock className="w-5 h-5" /></div>}
+                            {hasCatAccess ? (
+                              <Badge variant="default" className="bg-green-500 text-white">Owned</Badge>
+                            ) : (
+                              <div className="p-2 rounded-full bg-secondary text-muted-foreground"><Lock className="w-5 h-5" /></div>
+                            )}
                           </div>
                           <CardTitle className="text-lg md:text-xl font-bold group-hover:text-primary transition-colors">{category.name}</CardTitle>
                           <CardDescription className="line-clamp-2 text-sm">{category.description}</CardDescription>
@@ -346,13 +420,42 @@ const Tests = () => {
                             <Badge variant="secondary" className="font-semibold text-[10px] md:text-xs">{catTests.length} Total Challenges</Badge>
                             <div className="flex items-center gap-1 text-[10px] md:text-xs text-muted-foreground font-medium">
                               <Clock className="w-3.5 h-3.5" />
-                              {catTests.reduce((acc, t) => acc + t.duration_minutes, 0)} mins
+                              {totalDuration} mins
                             </div>
                           </div>
-                          <Button variant={hasCatAccess ? "gradient" : "outline"} className="w-full h-10 md:h-11 rounded-xl text-sm">
-                            {hasCatAccess ? 'Enter Arena' : 'Unlock Access'}
-                            {hasCatAccess ? <ArrowRight className="w-4 h-4 ml-2" /> : <Lock className="w-4 h-4 ml-2" />}
-                          </Button>
+                          {!hasCatAccess && totalPrice > 0 && (
+                            <div className="text-center">
+                              <span className="text-sm font-bold text-primary">₹{totalPrice}</span>
+                            </div>
+                          )}
+                          {hasCatAccess ? (
+                            <Button variant="gradient" className="w-full h-10 md:h-11 rounded-xl text-sm" onClick={() => navigate(`/tests/${category.slug}`)}>
+                              Enter Arena
+                              <ArrowRight className="w-4 h-4 ml-2" />
+                            </Button>
+                          ) : (
+                            <div className="flex flex-col gap-2">
+                              <Button
+                                variant="gradient"
+                                className="w-full h-10 md:h-11 rounded-xl text-sm"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleBuyCategory(category);
+                                }}
+                              >
+                                <ShoppingCart className="w-4 h-4 mr-2" />
+                                Buy Category (₹{totalPrice})
+                              </Button>
+                              <Button
+                                variant="outline"
+                                className="w-full h-10 md:h-11 rounded-xl text-sm"
+                                onClick={() => navigate(`/tests/${category.slug}`)}
+                              >
+                                View Details
+                                <ArrowRight className="w-4 h-4 ml-2" />
+                              </Button>
+                            </div>
+                          )}
                         </CardContent>
                       </Card>
                     </motion.div>);

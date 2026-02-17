@@ -21,8 +21,14 @@ import PurchaseHistory from "./pages/PurchaseHistory";
 import Notifications from "./pages/Notifications";
 import ProtectedRoute from "./components/auth/ProtectedRoute";
 import NotFound from "./pages/NotFound";
+import PrivacyPolicy from "./pages/PrivacyPolicy";
+import TermsOfService from "./pages/TermsOfService";
+import RefundPolicy from "./pages/RefundPolicy";
+
 const queryClient = new QueryClient();
-const App = () => (<QueryClientProvider client={queryClient}>
+
+const App = () => (
+  <QueryClientProvider client={queryClient}>
     <TooltipProvider>
       <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
         <AuthProvider>
@@ -30,28 +36,33 @@ const App = () => (<QueryClientProvider client={queryClient}>
           <Toaster />
           <Sonner />
           <Routes>
-            <Route path="/" element={<Index />}/>
-            <Route path="/courses" element={<Courses />}/>
-            <Route path="/courses/:category" element={<Courses />}/>
-            <Route path="/course/:id" element={<CourseDetails />}/>
-            <Route path="/tests" element={<Tests />}/>
-            <Route path="/tests/:category" element={<Tests />}/>
-            <Route path="/notes" element={<Notes />}/>
-            <Route path="/notes/:category" element={<Notes />}/>
-            <Route path="/leaderboard" element={<Leaderboard />}/>
-            <Route path="/purchases" element={<ProtectedRoute><PurchaseHistory /></ProtectedRoute>}/>
-            <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>}/>
-            <Route path="/referrals" element={<ProtectedRoute><Referrals /></ProtectedRoute>}/>
-            <Route path="/notifications" element={<ProtectedRoute><Notifications /></ProtectedRoute>}/>
-            <Route path="/admin" element={<ProtectedRoute requireAdmin><AdminDashboard /></ProtectedRoute>}/>
-            <Route path="/login" element={<Login />}/>
-            <Route path="/contact" element={<Contact />}/>
-            <Route path="/about" element={<About />}/>
+            <Route path="/" element={<Index />} />
+            <Route path="/courses" element={<Courses />} />
+            <Route path="/courses/:category" element={<Courses />} />
+            <Route path="/course/:id" element={<CourseDetails />} />
+            <Route path="/tests" element={<Tests />} />
+            <Route path="/tests/:category" element={<Tests />} />
+            <Route path="/notes" element={<Notes />} />
+            <Route path="/notes/:category" element={<Notes />} />
+            <Route path="/leaderboard" element={<Leaderboard />} />
+            <Route path="/purchases" element={<ProtectedRoute><PurchaseHistory /></ProtectedRoute>} />
+            <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
+            <Route path="/referrals" element={<ProtectedRoute><Referrals /></ProtectedRoute>} />
+            <Route path="/notifications" element={<ProtectedRoute><Notifications /></ProtectedRoute>} />
+            <Route path="/admin" element={<ProtectedRoute requireAdmin><AdminDashboard /></ProtectedRoute>} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/contact" element={<Contact />} />
+            <Route path="/about" element={<About />} />
+            <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+            <Route path="/terms-of-service" element={<TermsOfService />} />
+            <Route path="/refund-policy" element={<RefundPolicy />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-            <Route path="*" element={<NotFound />}/>
+            <Route path="*" element={<NotFound />} />
           </Routes>
         </AuthProvider>
       </BrowserRouter>
     </TooltipProvider>
-  </QueryClientProvider>);
+  </QueryClientProvider>
+);
+
 export default App;

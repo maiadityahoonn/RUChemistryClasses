@@ -105,58 +105,58 @@ const AdminDashboard = () => {
       default:
         return (<div className="space-y-6">
           {/* Stats Grid */}
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {stats.map((stat, index) => (<motion.div key={stat.label} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: index * 0.1 }} className="bg-card rounded-2xl p-6 border border-border">
-              <div className="flex items-start justify-between mb-4">
-                <div className={`p-3 rounded-xl ${stat.color}`}>
-                  <stat.icon className="w-6 h-6 text-primary-foreground" />
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-6">
+            {stats.map((stat, index) => (<motion.div key={stat.label} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: index * 0.1 }} className="bg-card rounded-2xl p-4 md:p-6 border border-border">
+              <div className="flex items-start justify-between mb-3 md:mb-4">
+                <div className={`p-2.5 md:p-3 rounded-xl ${stat.color}`}>
+                  <stat.icon className="w-5 h-5 md:w-6 md:h-6 text-primary-foreground" />
                 </div>
-                <Badge variant="secondary" className="text-success">
+                <Badge variant="secondary" className="text-success text-[10px] md:text-xs">
                   {stat.change}
                 </Badge>
               </div>
-              <p className="text-3xl font-bold text-card-foreground">{stat.value}</p>
-              <p className="text-sm text-muted-foreground">{stat.label}</p>
+              <p className="text-xl md:text-3xl font-bold text-card-foreground">{stat.value}</p>
+              <p className="text-[10px] md:text-sm text-muted-foreground uppercase tracking-wider font-semibold">{stat.label}</p>
             </motion.div>))}
           </div>
 
           {/* Quick Actions */}
-          <div className="grid md:grid-cols-3 gap-6">
-            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }} className="bg-card rounded-2xl p-6 border border-border cursor-pointer hover:border-primary/50 transition-colors" onClick={() => setActiveTab('courses')}>
-              <BookOpen className="w-10 h-10 text-primary mb-4" />
-              <h3 className="text-lg font-semibold mb-2">Manage Courses</h3>
-              <p className="text-sm text-muted-foreground">Add, edit, or remove courses from the platform</p>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 md:gap-6">
+            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }} className="bg-card rounded-2xl p-5 md:p-6 border border-border cursor-pointer hover:border-primary/50 transition-colors" onClick={() => setActiveTab('courses')}>
+              <BookOpen className="w-8 h-8 md:w-10 md:h-10 text-primary mb-3 md:mb-4" />
+              <h3 className="text-base md:text-lg font-semibold mb-1 md:mb-2">Courses</h3>
+              <p className="text-xs md:text-sm text-muted-foreground">Manage courses and content</p>
             </motion.div>
 
-            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5 }} className="bg-card rounded-2xl p-6 border border-border cursor-pointer hover:border-primary/50 transition-colors" onClick={() => setActiveTab('tests')}>
-              <ClipboardList className="w-10 h-10 text-accent mb-4" />
-              <h3 className="text-lg font-semibold mb-2">Manage Tests</h3>
-              <p className="text-sm text-muted-foreground">Create and manage category-wise tests</p>
+            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5 }} className="bg-card rounded-2xl p-5 md:p-6 border border-border cursor-pointer hover:border-primary/50 transition-colors" onClick={() => setActiveTab('tests')}>
+              <ClipboardList className="w-8 h-8 md:w-10 md:h-10 text-accent mb-3 md:mb-4" />
+              <h3 className="text-base md:text-lg font-semibold mb-1 md:mb-2">Tests</h3>
+              <p className="text-xs md:text-sm text-muted-foreground">Create and manage tests</p>
             </motion.div>
 
-            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.6 }} className="bg-card rounded-2xl p-6 border border-border cursor-pointer hover:border-primary/50 transition-colors" onClick={() => setActiveTab('notes')}>
-              <FileText className="w-10 h-10 text-success mb-4" />
-              <h3 className="text-lg font-semibold mb-2">Manage Notes</h3>
-              <p className="text-sm text-muted-foreground">Add study notes organized by category</p>
+            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.6 }} className="bg-card rounded-2xl p-5 md:p-6 border border-border cursor-pointer hover:border-primary/50 transition-colors" onClick={() => setActiveTab('notes')}>
+              <FileText className="w-8 h-8 md:w-10 md:h-10 text-success mb-3 md:mb-4" />
+              <h3 className="text-base md:text-lg font-semibold mb-1 md:mb-2">Notes</h3>
+              <p className="text-xs md:text-sm text-muted-foreground">Manage study materials</p>
             </motion.div>
           </div>
 
           {/* Activity Placeholder */}
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.7 }} className="bg-card rounded-2xl p-6 border border-border">
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-lg font-heading font-semibold text-card-foreground">
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.7 }} className="bg-card rounded-2xl p-4 md:p-6 border border-border">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-4 md:mb-6 gap-4">
+              <h2 className="text-base md:text-lg font-heading font-semibold text-card-foreground">
                 Platform Activity
               </h2>
-              <div className="flex gap-2">
-                <Button variant="secondary" size="sm">Daily</Button>
-                <Button variant="ghost" size="sm">Weekly</Button>
-                <Button variant="ghost" size="sm">Monthly</Button>
+              <div className="flex gap-1.5 md:gap-2 w-full sm:w-auto overflow-x-auto pb-2 sm:pb-0">
+                <Button variant="secondary" size="sm" className="text-[10px] md:text-xs">Daily</Button>
+                <Button variant="ghost" size="sm" className="text-[10px] md:text-xs">Weekly</Button>
+                <Button variant="ghost" size="sm" className="text-[10px] md:text-xs">Monthly</Button>
               </div>
             </div>
-            <div className="h-64 flex items-center justify-center bg-secondary/30 rounded-xl">
-              <div className="text-center">
-                <Activity className="w-12 h-12 mx-auto text-muted-foreground mb-3" />
-                <p className="text-muted-foreground">Activity chart will be displayed here</p>
+            <div className="h-48 md:h-64 flex items-center justify-center bg-secondary/30 rounded-xl">
+              <div className="text-center p-4">
+                <Activity className="w-8 h-8 md:w-12 md:h-12 mx-auto text-muted-foreground mb-2 md:mb-3" />
+                <p className="text-xs md:text-sm text-muted-foreground">Activity chart loading...</p>
               </div>
             </div>
           </motion.div>

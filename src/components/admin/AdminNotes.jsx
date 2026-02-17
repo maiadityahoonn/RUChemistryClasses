@@ -8,8 +8,9 @@ import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
-import { useNotes, useCreateNote, useUpdateNote, useDeleteNote, useUploadNoteFile, useDeleteNoteFile } from '@/hooks/useAdmin';
-import { useCategories } from '@/hooks/useCategories';
+import { useCreateNote, useUpdateNote, useDeleteNote, useUploadNoteFile, useDeleteNoteFile } from '@/hooks/useAdmin';
+import { useNotes } from '@/hooks/useNotes';
+import { categoryConfig } from '@/config/categoryConfig';
 
 const AdminNotes = () => {
   const [searchQuery, setSearchQuery] = useState('');
@@ -27,7 +28,6 @@ const AdminNotes = () => {
   const fileInputRef = useRef(null);
 
   const { data: notes, isLoading } = useNotes();
-  const { data: categories } = useCategories();
   const createNote = useCreateNote();
   const updateNote = useUpdateNote();
   const deleteNote = useDeleteNote();
@@ -162,9 +162,9 @@ const AdminNotes = () => {
                     <SelectValue placeholder="Select category" />
                   </SelectTrigger>
                   <SelectContent>
-                    {categories?.map((cat) => (
-                      <SelectItem key={cat.id} value={cat.name}>
-                        {cat.icon} {cat.name}
+                    {Object.keys(categoryConfig).map((catName) => (
+                      <SelectItem key={catName} value={catName}>
+                        {categoryConfig[catName].icon} {catName}
                       </SelectItem>
                     ))}
                   </SelectContent>

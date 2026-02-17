@@ -58,7 +58,7 @@ const Navbar = () => {
             <div className="flex items-center gap-2">
               {isAdmin && (
                 <Link to="/admin" className="hidden sm:block">
-                  <Button variant="ghost" size="icon" className="text-muted-foreground hover:text-primary">
+                  <Button variant="ghost" size="icon" className="text-muted-foreground hover:text-primary" aria-label="Admin Panel">
                     <Shield className="w-5 h-5" />
                   </Button>
                 </Link>
@@ -95,7 +95,7 @@ const Navbar = () => {
         className="lg:hidden fixed inset-x-4 top-24 z-50 bg-card/95 backdrop-blur-xl border border-border shadow-2xl rounded-2xl overflow-hidden shadow-primary/5"
       >
         <div className="p-4 space-y-1">
-          {navLinks.map((link) => (<Link key={link.path} to={link.path} onClick={() => setIsOpen(false)} className={`flex items-center px-4 py-3.5 rounded-xl font-semibold text-lg transition-all ${location.pathname === link.path
+          {navLinks.map((link) => (<Link key={link.path} to={link.path} onClick={() => setIsOpen(false)} className={`flex items-center px-4 py-3 md:py-3.5 rounded-xl font-semibold text-base md:text-lg transition-all ${location.pathname === link.path
             ? 'bg-primary/10 text-primary'
             : 'text-foreground hover:bg-secondary/80'}`}>
             {link.name}
@@ -103,51 +103,15 @@ const Navbar = () => {
 
           <div className="pt-4 mt-4 border-t border-border space-y-2">
             {user ? (<>
-              <Link to="/profile" onClick={() => setIsOpen(false)} className="block">
-                <Button variant="ghost" className="w-full justify-start h-12 rounded-xl">
-                  <User className="w-4 h-4 mr-3 text-muted-foreground" />
-                  My Profile
-                </Button>
-              </Link>
-
-              <Link to="/notifications" onClick={() => setIsOpen(false)} className="block">
-                <Button variant="ghost" className="w-full justify-start h-12 rounded-xl">
-                  <Bell className="w-4 h-4 mr-3 text-muted-foreground" />
-                  Notifications
-                </Button>
-              </Link>
-
-              <Link to="/purchases" onClick={() => setIsOpen(false)} className="block">
-                <Button variant="ghost" className="w-full justify-start h-12 rounded-xl">
-                  <ShoppingBag className="w-4 h-4 mr-3 text-muted-foreground" />
-                  My Store
-                </Button>
-              </Link>
-
-              <Link to="/referrals" onClick={() => setIsOpen(false)} className="block">
-                <Button variant="ghost" className="w-full justify-start h-12 rounded-xl">
-                  <Target className="w-4 h-4 mr-3 text-muted-foreground" />
-                  Refer & Earn
-                </Button>
-              </Link>
-
               {isAdmin && (<Link to="/admin" onClick={() => setIsOpen(false)} className="block">
-                <Button variant="outline" className="w-full justify-start h-12 border-primary/50 text-primary hover:bg-primary/10 rounded-xl">
+                <Button variant="outline" className="w-full justify-start h-11 md:h-12 border-primary/50 text-primary hover:bg-primary/10 rounded-xl text-sm md:text-base">
                   <Shield className="w-4 h-4 mr-3" />
                   Admin Panel
                 </Button>
               </Link>)}
-
-              <Button variant="ghost" className="w-full justify-start h-12 text-red-500 hover:text-red-600 hover:bg-red-500/10 rounded-xl" onClick={() => {
-                setIsOpen(false);
-                handleSignOut();
-              }}>
-                <LogOut className="w-4 h-4 mr-3" />
-                Sign Out
-              </Button>
             </>) : (
               <Link to="/login" onClick={() => setIsOpen(false)} className="block">
-                <Button variant="gradient" className="w-full h-12 rounded-xl">
+                <Button variant="gradient" className="w-full h-11 md:h-12 rounded-xl text-sm md:text-base font-bold">
                   <LogIn className="w-4 h-4 mr-2" />
                   Sign In
                 </Button>

@@ -34,6 +34,11 @@ const Profile = () => {
     const [isWalletOpen, setIsWalletOpen] = useState(false);
 
     useEffect(() => {
+        if (!loading && !profile) {
+            setBadgesLoading(false);
+            return;
+        }
+
         if (profile) {
             setEditForm({
                 username: profile.username || '',
@@ -49,7 +54,7 @@ const Profile = () => {
                 }
             }
         }
-    }, [profile]);
+    }, [profile, loading]);
 
     const fetchRank = async () => {
         if (!profile)
@@ -212,17 +217,17 @@ const Profile = () => {
 
         <main className="pt-20 pb-16">
             {/* Hero Section */}
-            <section className="py-12 bg-gradient-to-br from-primary/10 via-background to-accent/10 mb-8">
+            <section className="py-8 md:py-12 bg-gradient-to-br from-primary/10 via-background to-accent/10 mb-6 md:mb-8">
                 <div className="container mx-auto px-4">
                     <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="text-center max-w-3xl mx-auto">
-                        <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary mb-6">
-                            <User className="w-5 h-5" />
-                            <span className="font-medium">Personal Dashboard</span>
+                        <div className="inline-flex items-center gap-2 px-3 md:px-4 py-1.5 md:py-2 rounded-full bg-primary/10 text-primary mb-4 md:mb-6">
+                            <User className="w-4 h-4 md:w-5 md:h-5" />
+                            <span className="font-medium text-xs md:text-sm">Personal Dashboard</span>
                         </div>
-                        <h1 className="text-3xl md:text-5xl font-heading font-bold text-foreground mb-4">
+                        <h1 className="text-3xl md:text-5xl font-heading font-bold text-foreground mb-3 md:mb-4">
                             My <span className="text-primary">Profile</span>
                         </h1>
-                        <p className="text-lg text-muted-foreground">
+                        <p className="text-sm md:text-lg text-muted-foreground px-4">
                             Manage your account, track your progress, and view your achievements.
                         </p>
                     </motion.div>
@@ -233,9 +238,9 @@ const Profile = () => {
                 <div className="max-w-4xl mx-auto space-y-8">
                     {/* Profile Header */}
                     <Card className="overflow-hidden border-border shadow-xl bg-card/50 backdrop-blur-sm relative">
-                        <div className="h-24 bg-gradient-to-r from-primary/5 via-accent/5 to-background relative border-b border-border/10">
-                            <Button variant="secondary" size="sm" className="absolute bottom-4 right-4 bg-background/50 backdrop-blur-md hover:bg-background/80 border-border/50" onClick={() => setIsEditing(true)}>
-                                <Edit className="w-4 h-4 mr-2" />
+                        <div className="h-20 md:h-24 bg-gradient-to-r from-primary/5 via-accent/5 to-background relative border-b border-border/10">
+                            <Button variant="secondary" size="sm" className="absolute bottom-3 md:bottom-4 right-3 md:right-4 bg-background/50 backdrop-blur-md hover:bg-background/80 border-border/50 h-8 md:h-10 text-[10px] md:text-sm" onClick={() => setIsEditing(true)}>
+                                <Edit className="w-3.5 h-3.5 md:w-4 md:h-4 mr-1.5 md:mr-2" />
                                 Edit Profile
                             </Button>
                         </div>
@@ -243,92 +248,92 @@ const Profile = () => {
                             <div className="relative flex flex-col md:flex-row justify-between items-center md:items-end -mt-12 mb-6 gap-4">
                                 <div className="flex flex-col md:flex-row items-center md:items-end gap-4 md:gap-6">
                                     <div className="relative group">
-                                        <Avatar className="w-28 h-28 md:w-32 md:h-32 border-4 border-background shadow-xl ring-2 ring-primary/10">
+                                        <Avatar className="w-24 h-24 md:w-32 md:h-32 border-4 border-background shadow-xl ring-2 ring-primary/10">
                                             <AvatarImage src={profile.avatar_url || ''} />
-                                            <AvatarFallback className="text-3xl bg-primary/10 text-primary font-bold">
+                                            <AvatarFallback className="text-2xl md:text-3xl bg-primary/10 text-primary font-bold">
                                                 {profile.username?.charAt(0)}
                                             </AvatarFallback>
                                         </Avatar>
-                                        <div className="absolute inset-0 bg-black/40 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer" onClick={() => setIsEditing(true)}>
-                                            <Edit className="w-6 h-6 text-white" />
+                                        <div className="absolute inset-0 bg-black/40 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer text-white" onClick={() => setIsEditing(true)}>
+                                            <Edit className="w-5 h-5 md:w-6 md:h-6" />
                                         </div>
                                     </div>
-                                    <div className="mb-1 flex flex-col items-center md:items-start text-center md:text-left">
-                                        <div className="flex items-center gap-2 group cursor-pointer hover:text-primary transition-colors" onClick={() => setIsEditing(true)}>
-                                            <h1 className="text-2xl md:text-3xl font-bold font-heading">{profile.username}</h1>
-                                            <Edit className="w-5 h-5 opacity-0 group-hover:opacity-100 transition-opacity" />
+                                    <div className="mb-0.5 md:mb-1 flex flex-col items-center md:items-start text-center md:text-left">
+                                        <div className="flex items-center gap-1.5 md:gap-2 group cursor-pointer hover:text-primary transition-colors" onClick={() => setIsEditing(true)}>
+                                            <h1 className="text-xl md:text-3xl font-bold font-heading truncate max-w-[200px] md:max-w-none">{profile.username}</h1>
+                                            <Edit className="w-4 h-4 md:w-5 md:h-5 opacity-0 group-hover:opacity-100 transition-opacity" />
                                         </div>
-                                        <div className="flex flex-wrap items-center justify-center md:justify-start gap-2 mt-1">
-                                            <Badge variant="secondary" className="bg-primary/10 text-primary hover:bg-primary/20">
+                                        <div className="flex flex-wrap items-center justify-center md:justify-start gap-1.5 md:gap-2 mt-1">
+                                            <Badge variant="secondary" className="bg-primary/10 text-primary hover:bg-primary/20 text-[10px] md:text-xs">
                                                 Level {level}
                                             </Badge>
-                                            <span className="text-muted-foreground text-sm flex items-center gap-1">
-                                                <Flame className="w-3.5 h-3.5 text-orange-500" />
+                                            <span className="text-muted-foreground text-[10px] md:text-sm flex items-center gap-1">
+                                                <Flame className="w-3 h-3 md:w-3.5 md:h-3.5 text-orange-500" />
                                                 {streak} day streak
                                             </span>
-                                            <Badge variant="outline" className="border-green-500/30 text-green-600 bg-green-50 text-[10px]">
+                                            <Badge variant="outline" className="border-green-500/30 text-green-600 bg-green-50 text-[8px] md:text-[10px]">
                                                 <Coins className="w-3 h-3 mr-1" />
                                                 10 XP = ₹0.1
                                             </Badge>
                                         </div>
                                     </div>
                                 </div>
-                                <div className="mb-2 w-full md:w-auto">
-                                    <div className="text-center md:text-right bg-primary/5 md:bg-transparent p-3 md:p-0 rounded-xl border border-primary/10 md:border-0">
-                                        <p className="text-[10px] md:text-xs text-muted-foreground uppercase tracking-widest font-bold mb-1">Global Rank</p>
-                                        <p className="text-2xl md:text-3xl font-black text-primary">#{rank || '...'}</p>
+                                <div className="mb-0 md:mb-2 w-full md:w-auto">
+                                    <div className="text-center md:text-right bg-primary/5 md:bg-transparent p-2 md:p-0 rounded-xl border border-primary/10 md:border-0 flex md:flex-col items-center md:items-end justify-center gap-2 md:gap-0">
+                                        <p className="text-[8px] md:text-xs text-muted-foreground uppercase tracking-widest font-bold md:mb-1">Global Rank</p>
+                                        <p className="text-xl md:text-3xl font-black text-primary">#{rank || '...'}</p>
                                     </div>
                                 </div>
                             </div>
 
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 pt-4">
-                                <div className="space-y-4">
-                                    <div className="flex items-center gap-3 text-muted-foreground bg-secondary/30 p-3 rounded-lg border border-border/50">
-                                        <Mail className="w-4 h-4 text-primary" />
-                                        <span className="text-sm font-medium">{user.email}</span>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8 pt-4">
+                                <div className="space-y-3 md:space-y-4">
+                                    <div className="flex items-center gap-3 text-muted-foreground bg-secondary/30 p-2.5 md:p-3 rounded-lg border border-border/50">
+                                        <Mail className="w-4 h-4 text-primary shrink-0" />
+                                        <span className="text-xs md:text-sm font-medium truncate">{user.email}</span>
                                     </div>
-                                    <div className="flex items-center gap-3 text-muted-foreground bg-secondary/30 p-3 rounded-lg border border-border/50">
-                                        <Calendar className="w-4 h-4 text-primary" />
-                                        <span className="text-sm font-medium">Player since {new Date(user.created_at || '').toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}</span>
+                                    <div className="flex items-center gap-3 text-muted-foreground bg-secondary/30 p-2.5 md:p-3 rounded-lg border border-border/50">
+                                        <Calendar className="w-4 h-4 text-primary shrink-0" />
+                                        <span className="text-xs md:text-sm font-medium">Player since {new Date(user.created_at || '').toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}</span>
                                     </div>
                                 </div>
 
-                                <div className="bg-gradient-to-br from-primary/5 to-accent/5 p-5 rounded-2xl border border-primary/10 relative overflow-hidden group">
-                                    <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:rotate-12 transition-transform">
+                                <div className="bg-gradient-to-br from-primary/5 to-accent/5 p-4 md:p-5 rounded-2xl border border-primary/10 relative overflow-hidden group">
+                                    <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:rotate-12 transition-transform hidden sm:block">
                                         <Zap className="w-12 h-12 text-primary" />
                                     </div>
-                                    <div className="flex items-center justify-between mb-3">
-                                        <span className="font-bold text-sm tracking-tight">Progress to Level {level + 1}</span>
-                                        <span className="font-bold text-primary">{xp} XP</span>
+                                    <div className="flex items-center justify-between mb-2 md:mb-3">
+                                        <span className="font-bold text-xs md:text-sm tracking-tight">Progress to Level {level + 1}</span>
+                                        <span className="font-bold text-primary text-xs md:text-sm">{xp} XP</span>
                                     </div>
-                                    <Progress value={currentLevelProgress} className="h-2.5 mb-2" />
-                                    <p className="text-xs text-muted-foreground flex items-center justify-between">
+                                    <Progress value={currentLevelProgress} className="h-2 md:h-2.5 mb-2" />
+                                    <div className="text-[10px] md:text-xs text-muted-foreground flex items-center justify-between">
                                         <span>Level Up Goal</span>
                                         <span className="font-semibold text-foreground">{1000 - (xp % 1000)} XP Remaining</span>
-                                    </p>
+                                    </div>
                                 </div>
                             </div>
                         </CardContent>
                     </Card>
 
                     {/* Stats Overview */}
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
                         {[
-                            { label: 'Total XP', value: xp, icon: Zap, color: 'text-yellow-500', bg: 'bg-yellow-500/10', subValue: 'Lifetime Score' },
-                            { label: 'Elite Wallet', value: `₹${(reward_points / POINTS_PER_RUPEE).toFixed(2)}`, icon: Coins, color: 'text-green-500', bg: 'bg-green-500/10', subValue: `${reward_points} Points` },
-                            { label: 'Current Streak', value: `${streak} Days`, icon: Flame, color: 'text-orange-500', bg: 'bg-orange-500/10' },
-                            { label: 'Badges', value: `${unlockedBadgeIds.length} / ${allBadges.length}`, icon: Award, color: 'text-purple-500', bg: 'bg-purple-500/10' },
+                            { label: 'Total XP', value: xp, icon: Zap, color: 'text-yellow-500', bg: 'bg-yellow-500/10', subValue: 'Score' },
+                            { label: 'Elite Wallet', value: `₹${(reward_points / POINTS_PER_RUPEE).toFixed(2)}`, icon: Coins, color: 'text-green-500', bg: 'bg-green-500/10', subValue: `${reward_points} Pts` },
+                            { label: 'Streak', value: `${streak} Days`, icon: Flame, color: 'text-orange-500', bg: 'bg-orange-500/10' },
+                            { label: 'Badges', value: `${unlockedBadgeIds.length}/${allBadges.length}`, icon: Award, color: 'text-purple-500', bg: 'bg-purple-500/10' },
                         ].map((stat, i) => (
                             <motion.div key={stat.label} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.1 }}>
                                 <Card className={`hover:shadow-md transition-all cursor-pointer border-border/40 hover:border-primary/50 group active:scale-95 ${stat.label === 'Elite Wallet' ? 'ring-1 ring-primary/20 bg-primary/5' : ''}`} onClick={() => stat.label === 'Elite Wallet' && setIsWalletOpen(true)}>
-                                    <CardContent className="p-3 md:p-5 flex flex-col md:flex-row items-center gap-2 md:gap-4 text-center md:text-left">
-                                        <div className={`w-10 h-10 rounded-xl ${stat.bg} flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform`}>
-                                            <stat.icon className={`w-5 h-5 ${stat.color}`} />
+                                    <CardContent className="p-3 md:p-5 flex flex-col md:flex-row items-center md:items-center gap-2 md:gap-4 text-center md:text-left">
+                                        <div className={`w-8 h-8 md:w-10 md:h-10 rounded-lg md:rounded-xl ${stat.bg} flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform`}>
+                                            <stat.icon className={`w-4 h-4 md:w-5 md:h-5 ${stat.color}`} />
                                         </div>
-                                        <div>
-                                            <p className="text-muted-foreground text-[8px] md:text-[10px] font-bold uppercase tracking-wider">{stat.label}</p>
-                                            <p className="text-sm md:text-xl font-bold truncate">{stat.value}</p>
-                                            {'subValue' in stat && <p className="hidden md:block text-[10px] text-muted-foreground">{stat.subValue}</p>}
+                                        <div className="min-w-0">
+                                            <p className="text-muted-foreground text-[7px] md:text-[10px] font-bold uppercase tracking-wider truncate">{stat.label}</p>
+                                            <p className="text-xs md:text-xl font-bold truncate leading-tight">{stat.value}</p>
+                                            {'subValue' in stat && <p className="hidden md:block text-[10px] text-muted-foreground truncate">{stat.subValue}</p>}
                                         </div>
                                     </CardContent>
                                 </Card>
@@ -348,18 +353,18 @@ const Profile = () => {
                             </Badge>
                         </div>
 
-                        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4">
+                        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3 md:gap-4">
                             {allBadges.map((badge, index) => {
                                 const isUnlocked = unlockedBadgeIds.includes(badge.id);
-                                return (<motion.div key={badge.id} initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.2 + index * 0.05 }} className={`relative group p-4 rounded-2xl border flex flex-col items-center text-center gap-3 transition-all duration-300 ${isUnlocked
+                                return (<motion.div key={badge.id} initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.2 + index * 0.05 }} className={`relative group p-3 md:p-4 rounded-xl md:rounded-2xl border flex flex-col items-center text-center gap-2 md:gap-3 transition-all duration-300 ${isUnlocked
                                     ? 'bg-card border-border hover:border-primary/50 hover:shadow-lg'
                                     : 'bg-secondary/20 border-transparent grayscale opacity-50'}`}>
-                                    <div className={`w-14 h-14 md:w-16 md:h-16 rounded-2xl md:rounded-3xl ${badge.color || 'bg-primary'} flex items-center justify-center text-2xl md:text-3xl shadow-lg transform group-hover:scale-110 transition-transform`}>
+                                    <div className={`w-12 h-12 md:w-16 md:h-16 rounded-xl md:rounded-3xl ${badge.color || 'bg-primary'} flex items-center justify-center text-xl md:text-3xl shadow-lg transform group-hover:scale-110 transition-transform`}>
                                         {badge.icon}
                                     </div>
-                                    <div className="space-y-1">
-                                        <h3 className="font-bold text-xs md:text-sm leading-tight">{badge.name}</h3>
-                                        <p className="text-[9px] md:text-[10px] text-muted-foreground leading-tight px-1">{badge.description}</p>
+                                    <div className="space-y-0.5 md:space-y-1">
+                                        <h3 className="font-bold text-[10px] md:text-sm leading-tight line-clamp-1">{badge.name}</h3>
+                                        <p className="text-[8px] md:text-[10px] text-muted-foreground leading-tight px-1 line-clamp-2">{badge.description}</p>
                                     </div>
                                 </motion.div>);
                             })}
@@ -371,10 +376,10 @@ const Profile = () => {
 
         {/* Edit Profile Modal */}
         <Dialog open={isEditing} onOpenChange={setIsEditing}>
-            <DialogContent className="sm:max-w-[425px] overflow-hidden p-0">
+            <DialogContent className="w-[calc(100vw-2rem)] sm:max-w-[425px] overflow-hidden p-0">
                 <div className="h-2 bg-gradient-to-r from-primary to-accent"></div>
-                <DialogHeader className="p-6 pb-0">
-                    <DialogTitle className="text-2xl font-bold font-heading">Edit Your Profile</DialogTitle>
+                <DialogHeader className="p-4 md:p-6 pb-0">
+                    <DialogTitle className="text-xl md:text-2xl font-bold font-heading">Edit Your Profile</DialogTitle>
                     <DialogDescription>
                         Customize how other players see you on the leaderboard.
                     </DialogDescription>

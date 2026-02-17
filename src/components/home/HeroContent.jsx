@@ -9,7 +9,7 @@ const HeroContent = () => {
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="text-center max-w-4xl mx-auto">
         <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary text-[10px] sm:text-sm font-medium mb-6">
           <Sparkles className="w-4 h-4" />
-          Welcome to Ruchi Chemistry Classes
+          Welcome to Ruchi Upadhyay Chemistry Classes
         </span>
 
         <h1 className="text-2xl sm:text-4xl md:text-5xl lg:text-6xl font-heading font-bold text-foreground mb-4 sm:mb-6 leading-tight">

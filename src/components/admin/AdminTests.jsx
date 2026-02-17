@@ -10,7 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
 import { useTests, useCreateTest, useUpdateTest, useDeleteTest } from '@/hooks/useAdmin';
-import { useCategories } from '@/hooks/useCategories';
+import { categoryConfig } from '@/config/categoryConfig';
 
 const AdminTests = () => {
   const [searchQuery, setSearchQuery] = useState('');
@@ -29,7 +29,6 @@ const AdminTests = () => {
   });
 
   const { data: tests, isLoading } = useTests();
-  const { data: categories } = useCategories();
   const createTest = useCreateTest();
   const updateTest = useUpdateTest();
   const deleteTest = useDeleteTest();
@@ -150,9 +149,9 @@ const AdminTests = () => {
                       <SelectValue placeholder="Select category" />
                     </SelectTrigger>
                     <SelectContent>
-                      {categories?.map((cat) => (
-                        <SelectItem key={cat.id} value={cat.name}>
-                          {cat.icon} {cat.name}
+                      {Object.keys(categoryConfig).map((catName) => (
+                        <SelectItem key={catName} value={catName}>
+                          {categoryConfig[catName].icon} {catName}
                         </SelectItem>
                       ))}
                     </SelectContent>

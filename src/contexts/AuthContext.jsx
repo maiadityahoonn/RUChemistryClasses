@@ -138,20 +138,29 @@ export const AuthProvider = ({ children }) => {
         return { error: null };
     };
     const signOut = async () => {
-        const { error } = await supabase.auth.signOut();
-        if (error) {
-            toast({
-                title: 'Sign out failed',
-                description: error.message,
-                variant: 'destructive',
-            });
-            return;
+        try {
+            const { error } = await supabase.auth.signOut();
+            if (error && !error.message.includes('session_not_found') && !error.message.includes('Auth session missing')) {
+                toast({
+                    title: 'Sign out failed',
+                    description: error.message,
+                    variant: 'destructive',
+                });
+                return;
+            }
         }
-        setProfile(null);
-        toast({
-            title: 'Signed out',
-            description: 'You have been signed out.',
-        });
+        catch (err) {
+            console.error('Sign out error:', err);
+        }
+        finally {
+            setProfile(null);
+            setSession(null);
+            setUser(null);
+            toast({
+                title: 'Signed out',
+                description: 'You have been signed out.',
+            });
+        }
     };
     const updateProfile = async (updates) => {
         if (!user)
@@ -225,19 +234,19 @@ export const AuthProvider = ({ children }) => {
         });
     };
     return (<AuthContext.Provider value={{
-            user,
-            session,
-            profile,
-            loading,
-            signUp,
-            signIn,
-            signOut,
-            updateProfile,
-            addXP,
-            addRewardPoints,
-            createProfile,
-            refetchProfile: () => user ? fetchProfile(user.id).then(setProfile) : Promise.resolve(null),
-        }}>
-      {children}
+        user,
+        session,
+        profile,
+        loading,
+        signUp,
+        signIn,
+        signOut,
+        updateProfile,
+        addXP,
+        addRewardPoints,
+        createProfile,
+        refetchProfile: () => user ? fetchProfile(user.id).then(setProfile) : Promise.resolve(null),
+    }}>
+        {children}
     </AuthContext.Provider>);
 };

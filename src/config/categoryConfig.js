@@ -19,6 +19,11 @@ export const categoryConfig = {
         gradient: "from-teal-500 to-cyan-400",
         description: "Foundation chemistry concepts for Class 9 students."
     },
+    "Class 10": {
+        icon: "📘",
+        gradient: "from-blue-500 to-indigo-400",
+        description: "Core chemistry concepts for Class 10 Board Exams."
+    },
     "Class 11": {
         icon: "📚",
         gradient: "from-green-500 to-emerald-400",

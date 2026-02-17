@@ -18,6 +18,7 @@ export const useLeaderboard = () => {
             .limit(5); // Limit to 5 as requested
         if (error) {
             console.error('Error fetching leaderboard:', error);
+            setLoading(false);
             return;
         }
         const rankedData = (data || []).map((profile, index) => ({
@@ -56,13 +57,13 @@ export const useLeaderboard = () => {
         const channel = supabase
             .channel('leaderboard-changes')
             .on('postgres_changes', {
-            event: '*',
-            schema: 'public',
-            table: 'profiles',
-        }, () => {
-            // Refetch leaderboard on any profile change
-            fetchLeaderboard();
-        })
+                event: '*',
+                schema: 'public',
+                table: 'profiles',
+            }, () => {
+                // Refetch leaderboard on any profile change
+                fetchLeaderboard();
+            })
             .subscribe();
         return () => {
             supabase.removeChannel(channel);

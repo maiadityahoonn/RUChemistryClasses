@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { Star, Quote } from 'lucide-react';
+import { Star, Quote, User } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 
@@ -108,7 +108,9 @@ const TestimonialsSection = () => {
 
           {/* Author */}
           <div className="flex items-center gap-3 mt-auto">
-            <img src={testimonial.imageUrl || '/placeholder.svg'} alt={testimonial.name} className="w-12 h-12 rounded-full object-cover border-2 border-primary" />
+            <div className="w-12 h-12 rounded-full bg-gradient-to-br from-primary/20 to-accent/20 flex items-center justify-center border-2 border-primary shadow-inner">
+              <User className="w-6 h-6 text-primary" />
+            </div>
             <div>
               <h4 className="font-semibold text-card-foreground text-sm">{testimonial.name}</h4>
               <p className="text-[10px] text-muted-foreground">{testimonial.role}</p>

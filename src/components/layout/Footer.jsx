@@ -36,12 +36,12 @@ const Footer = () => {
           </h4>
           <ul className="space-y-3.5 md:space-y-4">
             {[
-              { name: 'Home Landing', path: '/' },
-              { name: 'Premium Courses', path: '/courses' },
-              { name: 'Study Notes', path: '/notes' },
-              { name: 'Interactive Tests', path: '/tests' },
+              { name: 'Home', path: '/' },
+              { name: 'Courses', path: '/courses' },
+              { name: 'Notes', path: '/notes' },
+              { name: 'Tests', path: '/tests' },
               { name: 'Global Leaderboard', path: '/leaderboard' },
-              { name: 'Support Center', path: '/contact' },
+              { name: 'Contact', path: '/contact' },
             ].map((item) => (<li key={item.name}>
               <Link to={item.path} className="text-gray-400 hover:text-primary transition-all duration-300 flex items-center justify-center sm:justify-start group text-base">
                 <ArrowRight className="w-0 h-4 mr-0 md:group-hover:w-4 md:group-hover:mr-2 transition-all duration-300 text-primary opacity-0 group-hover:opacity-100 hidden md:block" />
@@ -85,7 +85,7 @@ const Footer = () => {
               </div>
               <div className="space-y-1 text-left">
                 <p className="text-sm font-bold text-white italic">Visit Us</p>
-                <p className="text-gray-400 text-sm leading-relaxed">Education City, India - 110001</p>
+                <p className="text-gray-400 text-sm leading-relaxed">Bhopal, MP - 462022</p>
               </div>
             </div>
 
@@ -95,8 +95,8 @@ const Footer = () => {
               </div>
               <div className="space-y-1 text-left">
                 <p className="text-sm font-bold text-white italic">Mail Us</p>
-                <a href="mailto:contact@ruchichemistry.com" className="text-gray-400 text-sm hover:text-primary transition-colors">
-                  info@ruchichemistry.com
+                <a href="mailto:info@ruchiupadhyay.com" className="text-gray-400 text-sm hover:text-primary transition-colors">
+                  info@ruchiupadhyay.com
                 </a>
               </div>
             </div>
@@ -107,8 +107,8 @@ const Footer = () => {
               </div>
               <div className="space-y-1 text-left">
                 <p className="text-sm font-bold text-white italic">Call Us</p>
-                <a href="tel:+919876543210" className="text-gray-400 text-sm hover:text-primary transition-colors">
-                  +91 98765 43210
+                <a href="tel:+917225814452" className="text-gray-400 text-sm hover:text-primary transition-colors">
+                  +91 72258 14452
                 </a>
               </div>
             </div>
@@ -141,9 +141,13 @@ const Footer = () => {
 
         {/* Right: Policies */}
         <div className="flex flex-wrap justify-center gap-4 sm:gap-6 order-2 lg:order-3">
-          {['Privacy Policy', 'Terms of Service', 'Refund Policy'].map((text) => (<a key={text} href="#" className="text-gray-500 hover:text-white text-[10px] sm:text-xs tracking-wider uppercase transition-colors">
-            {text}
-          </a>))}
+          {[
+            { name: 'Privacy Policy', path: '/privacy-policy' },
+            { name: 'Terms of Service', path: '/terms-of-service' },
+            { name: 'Refund Policy', path: '/refund-policy' },
+          ].map((item) => (<Link key={item.name} to={item.path} className="text-gray-500 hover:text-white text-[10px] sm:text-xs tracking-wider uppercase transition-colors">
+            {item.name}
+          </Link>))}
         </div>
       </div>
     </div>

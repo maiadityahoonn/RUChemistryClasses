@@ -40,8 +40,13 @@ const Footer = () => {
               { name: 'Courses', path: '/courses' },
               { name: 'Notes', path: '/notes' },
               { name: 'Tests', path: '/tests' },
+<<<<<<< HEAD
               { name: 'Global Leaderboard', path: '/leaderboard' },
               { name: 'Contact', path: '/contact' },
+=======
+              { name: 'Leaderboard', path: '/leaderboard' },
+              { name: 'Support Center', path: '/contact' },
+>>>>>>> 53a43dbc19f945b22124c981018ec5e4737754f8
             ].map((item) => (<li key={item.name}>
               <Link to={item.path} className="text-gray-400 hover:text-primary transition-all duration-300 flex items-center justify-center sm:justify-start group text-base">
                 <ArrowRight className="w-0 h-4 mr-0 md:group-hover:w-4 md:group-hover:mr-2 transition-all duration-300 text-primary opacity-0 group-hover:opacity-100 hidden md:block" />
@@ -107,8 +112,13 @@ const Footer = () => {
               </div>
               <div className="space-y-1 text-left">
                 <p className="text-sm font-bold text-white italic">Call Us</p>
+<<<<<<< HEAD
                 <a href="tel:+917225814452" className="text-gray-400 text-sm hover:text-primary transition-colors">
                   +91 72258 14452
+=======
+                <a href="tel:+919876543210" className="text-gray-400 text-sm hover:text-primary transition-colors">
+                  +91 7225814452
+>>>>>>> 53a43dbc19f945b22124c981018ec5e4737754f8
                 </a>
               </div>
             </div>
